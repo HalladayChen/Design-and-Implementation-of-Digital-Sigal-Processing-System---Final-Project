@@ -1,0 +1,469 @@
+/* =================================================================================
+File name  : main.c
+Modify     : MAIWEI /sales@mcudsp.com.tw
+Website    : http://www.mcudsp.com.tw
+Version    : V1.0
+Description: Primary system file for the DTMF Labs.
+==================================================================================*/
+#include "easyDSP-Expansion_Board.h"
+#include "math.h"
+
+#define SAMPLING_FREQ 8000
+#define PI 3.14159265358979
+#define loop_time 12000/2
+#define GAIN 1.0
+#define BUF_SIZE 3000
+short buffer[BUF_SIZE];
+short left_sample,left_output,delayed,right_sample,right_output,output;
+int i= 0;
+
+unsigned short row=0,col=0,sample=0;
+unsigned short digital=15,old_digital=15;
+short DTMF_count=0,DTMF_flag=0;
+int flag,n;
+long count=0;
+
+float A,B,C,D,E,F,G;
+
+int main(void)
+{
+  Board_Init(); //Initial easyDSP-Expansion_Board
+  Setup_Audio_Init(FS_12000_HZ,ADC_GAIN_0DB,DAC_ATTEN_0DB,LINE_INPUT);
+
+
+
+  while(1)
+  {
+      if (Read_SW(1)==1)
+               {
+                   n=1;
+                   LCD_PUT_CMD(LCD_FIRST_LINE);
+                             LCD_PUT_CHAR('F');
+                             LCD_PUT_CHAR('r');
+                             LCD_PUT_CHAR('e');
+                             LCD_PUT_CHAR('q');
+                             LCD_PUT_CHAR(32);
+                             LCD_PUT_CHAR('*');
+                             LCD_PUT_CHAR('1');
+                             LCD_PUT_CHAR(32);
+
+
+                         }
+      else if (Read_SW(2)==1)
+                     {
+                         n=2;
+                         LCD_PUT_CMD(LCD_FIRST_LINE);
+                                                     LCD_PUT_CHAR('F');
+                                                     LCD_PUT_CHAR('r');
+                                                     LCD_PUT_CHAR('e');
+                                                     LCD_PUT_CHAR('q');
+                                                     LCD_PUT_CHAR(32);
+                                                     LCD_PUT_CHAR('*');
+                                                     LCD_PUT_CHAR('2');
+                                                     LCD_PUT_CHAR(32);
+
+
+                               }
+      else if (Read_SW(3)==1)
+                     {
+                         n=3;
+                         LCD_PUT_CMD(LCD_FIRST_LINE);
+                                                     LCD_PUT_CHAR('F');
+                                                     LCD_PUT_CHAR('r');
+                                                     LCD_PUT_CHAR('e');
+                                                     LCD_PUT_CHAR('q');
+                                                     LCD_PUT_CHAR(32);
+                                                     LCD_PUT_CHAR('*');
+                                                     LCD_PUT_CHAR('3');
+                                                     LCD_PUT_CHAR(32);
+
+                                                                                }
+      else if (Read_SW(4)==1)
+                     {
+                         n=4;
+                         LCD_PUT_CMD(LCD_FIRST_LINE);
+                                                     LCD_PUT_CHAR('F');
+                                                     LCD_PUT_CHAR('r');
+                                                     LCD_PUT_CHAR('e');
+                                                     LCD_PUT_CHAR('q');
+                                                     LCD_PUT_CHAR(32);
+                                                     LCD_PUT_CHAR('*');
+                                                     LCD_PUT_CHAR('4');
+                                                     LCD_PUT_CHAR(32);
+
+                                                  }
+
+
+      digital = Read_keypad();
+      if (flag==1){
+
+      switch(digital)
+           {
+           case 1://0
+            row=0*n;
+            col=0;
+            break;
+           case 2://8
+            row=440.0*n;
+            col=0;
+            break;
+           case 3://5
+            row=349.0*n;
+            col=0;
+            break;
+           case 4://#
+            row=0*n;
+            col=0;
+            break;
+           case 5://9
+            row=466.0*n;
+            col=0;
+            break;
+           case 6://6
+            row=369.0*n;
+            col=0;
+            break;
+           case 7://D
+            row=0*n;
+            col=0;
+            break;
+           case 8://C
+            row=493*n;
+            col=0;
+            break;
+           case 9://B
+            row=392.0*n;
+            col=0;
+            break;
+           case 0://*
+            row=523.0*n;
+            col=0;
+            break;
+           case 10: //7
+            row=415.0*n;
+            col=0;
+            break;
+           case 11: //4
+            row=329.0*n;
+            col=0;
+            break;
+           case 12: //A
+            row=311.0*n;
+            col=0;
+            break;
+           case 13: //3
+            row=293.0*n;
+            col=0;
+            break;
+           case 14: //2
+            row=277.0*n;
+            col=0;
+            break;
+           case 15: //1
+            row=262.0*n;
+            col=0;
+            break;
+          }
+     }
+     else if (flag==2){
+
+         switch(digital)
+              {
+         case 1://0
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 2://8
+                     row=440.0*n;
+                     col=0;
+                     break;
+                    case 3://5
+                     row=349.0*n;
+                     col=0;
+                     break;
+                    case 4://#
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 5://9
+                     row=466.0*n;
+                     col=0;
+                     break;
+                    case 6://6
+                     row=369.0*n;
+                     col=0;
+                     break;
+                    case 7://D
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 8://C
+                     row=493*n;
+                     col=0;
+                     break;
+                    case 9://B
+                     row=392.0*n;
+                     col=0;
+                     break;
+                    case 0://*
+                     row=523.0*n;
+                     col=0;
+                     break;
+                    case 10: //7
+                     row=415.0*n;
+                     col=0;
+                     break;
+                    case 11: //4
+                     row=329.0*n;
+                     col=0;
+                     break;
+                    case 12: //A
+                     row=311.0*n;
+                     col=0;
+                     break;
+                    case 13: //3
+                     row=293.0*n;
+                     col=0;
+                     break;
+                    case 14: //2
+                     row=277.0*n;
+                     col=0;
+                     break;
+                    case 15: //1
+                     row=262.0*n;
+                     col=0;
+                     break;
+             }
+
+     }
+     else if (flag==3){
+
+         switch(digital)
+              {
+         case 1://0
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 2://8
+                     row=440.0*n;
+                     col=0;
+                     break;
+                    case 3://5
+                     row=349.0*n;
+                     col=0;
+                     break;
+                    case 4://#
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 5://9
+                     row=466.0*n;
+                     col=0;
+                     break;
+                    case 6://6
+                     row=369.0*n;
+                     col=0;
+                     break;
+                    case 7://D
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 8://C
+                     row=493*n;
+                     col=0;
+                     break;
+                    case 9://B
+                     row=392.0*n;
+                     col=0;
+                     break;
+                    case 0://*
+                     row=523.0*n;
+                     col=0;
+                     break;
+                    case 10: //7
+                     row=415.0*n;
+                     col=0;
+                     break;
+                    case 11: //4
+                     row=329.0*n;
+                     col=0;
+                     break;
+                    case 12: //A
+                     row=311.0*n;
+                     col=0;
+                     break;
+                    case 13: //3
+                     row=293.0*n;
+                     col=0;
+                     break;
+                    case 14: //2
+                     row=277.0*n;
+                     col=0;
+                     break;
+                    case 15: //1
+                     row=262.0*n;
+                     col=0;
+                     break;
+             }
+
+     }
+     else if (flag==4){
+
+         switch(digital)
+         {
+         case 1://0
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 2://8
+                     row=440.0*n;
+                     col=0;
+                     break;
+                    case 3://5
+                     row=349.0*n;
+                     col=0;
+                     break;
+                    case 4://#
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 5://9
+                     row=466.0*n;
+                     col=0;
+                     break;
+                    case 6://6
+                     row=369.0*n;
+                     col=0;
+                     break;
+                    case 7://D
+                     row=0*n;
+                     col=0;
+                     break;
+                    case 8://C
+                     row=493*n;
+                     col=0;
+                     break;
+                    case 9://B
+                     row=392.0*n;
+                     col=0;
+                     break;
+                    case 0://*
+                     row=523.0*n;
+                     col=0;
+                     break;
+                    case 10: //7
+                     row=415.0*n;
+                     col=0;
+                     break;
+                    case 11: //4
+                     row=329.0*n;
+                     col=0;
+                     break;
+                    case 12: //A
+                     row=311.0*n;
+                     col=0;
+                     break;
+                    case 13: //3
+                     row=293.0*n;
+                     col=0;
+                     break;
+                    case 14: //2
+                     row=277.0*n;
+                     col=0;
+                     break;
+                    case 15: //1
+                     row=262.0*n;
+                     col=0;
+                     break;
+         }
+
+     }
+      if(DTMF_flag==1)
+      {
+          if(old_digital != digital)
+          {
+          DTMF_count = 0;
+          DTMF_flag = 0;
+          }
+      }
+  }
+}
+//-------------------------------
+// interrupt service routine #4
+//-------------------------------
+interrupt void INT4_ISR(void)
+{
+    if(DTMF_count < loop_time)
+    {
+        if (flag == 1){
+
+            A = sin(2.0*PI*DTMF_count*row/SAMPLING_FREQ)+sin(2.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            B = 0.75*sin(6.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.75*sin(6.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            C = 0.5*sin(10.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.5*sin(10.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            D = 0.14*sin(14.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.14*sin(14.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            sample=10000*(A + B + C + D);
+        }
+
+        else if (flag == 2){
+            A = sin(2.0*PI*DTMF_count*row/SAMPLING_FREQ)+sin(2.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            B = 0.75*sin(6.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.75*sin(6.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            C = 0.5*sin(10.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.5*sin(10.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            D = 0.14*sin(14.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.14*sin(14.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            E = 0.5*sin(18.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.5*sin(18.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            F = 0.12*sin(22.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.12*sin(22.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            G = 0.17*sin(26.0*PI*DTMF_count*row/SAMPLING_FREQ)+0.17*sin(26.0*PI*DTMF_count*col/SAMPLING_FREQ);
+            sample=10000*(A+B+C+D+E+F+G);
+
+        }
+
+        else if (flag == 3){
+
+            sample=10000*(-1/4 *sin(3.0*PI*DTMF_count*row/SAMPLING_FREQ)-1/4*sin(3.0*PI*DTMF_count*col/SAMPLING_FREQ)+ 1/4*sin(PI*DTMF_count*row/SAMPLING_FREQ)+ 1/4*sin(PI*DTMF_count*col/SAMPLING_FREQ)+ 1.732/2*cos(PI*DTMF_count*row/SAMPLING_FREQ)+1.732/2*cos(PI*DTMF_count*col/SAMPLING_FREQ));
+        }
+
+       else if (flag == 4){
+            sample=20000*(sin(2.0*PI*DTMF_count*row/SAMPLING_FREQ)+sin(2.0*PI*DTMF_count*col/SAMPLING_FREQ));
+       }
+       DTMF_count++;
+    }
+    else
+    {
+        sample = 0;
+        DTMF_flag=1;
+        old_digital = digital;
+        DTMF_count = loop_time;
+    }
+
+
+
+    output_left_sample(sample);
+    return;
+}
+
+interrupt void INT5_ISR(void)
+{
+    flag = 1;
+    return;
+}
+
+interrupt void INT6_ISR(void)
+{
+    flag = 2;
+    return;
+}
+
+interrupt void INT7_ISR(void)
+{
+
+
+    flag = 3;
+    return ;
+}
+
+interrupt void INT8_ISR(void)
+{
+    flag = 4;
+    return ;
+}
+
+
